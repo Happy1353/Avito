@@ -1,6 +1,11 @@
 package config
 
-import "os"
+import (
+	"log"
+	"os"
+
+	"github.com/joho/godotenv"
+)
 
 type DatabaseConfig struct {
 	Host     string
@@ -11,6 +16,11 @@ type DatabaseConfig struct {
 }
 
 func LoadDatabaseConfig() DatabaseConfig {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
 	return DatabaseConfig{
 		Host:     getEnv("DATABASE_HOST", "localhost"),
 		Port:     getEnv("DATABASE_PORT", "5432"),

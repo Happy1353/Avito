@@ -12,6 +12,11 @@ type User struct {
 	Balance  int
 }
 
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 type UserRepository struct {
 	db *sql.DB
 }

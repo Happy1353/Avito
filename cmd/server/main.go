@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/Happy1353/Avito/config"
 	"github.com/Happy1353/Avito/internal/database"
@@ -25,14 +26,17 @@ func main() {
 	userRepo := repository.NewUserRepository(db)
 	sessionRepo := repository.NewSessionRepository(db)
 
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		log.Fatal("JWT_SECRET is not set")
+	}
 
-	authService := service.NewAuthService(userRepo, sessionRepo, "your_jwt_secret")
+	authService := service.NewAuthService(userRepo, sessionRepo, jwtSecret)
 	authHandler := handler.NewAuthHandler(authService)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-	// Добавляем маршруты
 	r.Post("/login", authHandler.Login)
 
 	log.Println("Starting server on :8080")
