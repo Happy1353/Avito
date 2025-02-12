@@ -26,14 +26,6 @@ CREATE TABLE purchases (
     created_at TIMESTAMP DEFAULT now()
 );
 
-CREATE TABLE sessions (
-    id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    token TEXT UNIQUE NOT NULL,
-    created_at TIMESTAMP DEFAULT now()
-);
-
-
 INSERT INTO merchandise (name, price) VALUES 
     ('t-shirt', 80), ('cup', 20), ('book', 50), ('pen', 10), ('powerbank', 200),
     ('hoody', 300), ('umbrella', 200), ('socks', 10), ('wallet', 50), ('pink-hoody', 500);

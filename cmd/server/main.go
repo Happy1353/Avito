@@ -7,11 +7,8 @@ import (
 
 	"github.com/Happy1353/Avito/config"
 	"github.com/Happy1353/Avito/internal/database"
-	handler "github.com/Happy1353/Avito/internal/handlers"
 	"github.com/Happy1353/Avito/internal/repository"
-	"github.com/Happy1353/Avito/internal/service"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	"github.com/Happy1353/Avito/internal/router"
 )
 
 func main() {
@@ -24,20 +21,14 @@ func main() {
 	defer db.Close()
 
 	userRepo := repository.NewUserRepository(db)
-	sessionRepo := repository.NewSessionRepository(db)
 
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {
 		log.Fatal("JWT_SECRET is not set")
 	}
 
-	authService := service.NewAuthService(userRepo, sessionRepo, jwtSecret)
-	authHandler := handler.NewAuthHandler(authService)
-
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-
-	r.Post("/login", authHandler.Login)
+	r := router.NewRouter(userRepo, jwtSecret)
 
 	log.Println("Starting server on :8080")
-	log.Fatal(http.ListenAndServe(":8080", r))}
+	log.Fatal(http.ListenAndServe(":8080", r))
+}

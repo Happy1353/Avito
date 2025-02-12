@@ -1,8 +1,7 @@
-package handler
+package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/Happy1353/Avito/internal/repository"
@@ -25,9 +24,6 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
-
-	// Выводим полученные данные
-	fmt.Println("user:", credentials.Username, "password:", credentials.Password)
 
 	token, err := h.authService.Login(r.Context(), credentials.Username, credentials.Password)
 	if err != nil {

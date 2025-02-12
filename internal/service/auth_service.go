@@ -12,14 +12,14 @@ import (
 
 type AuthService struct {
 	userRepo    *repository.UserRepository
-	sessionRepo *repository.SessionRepository
 	jwtSecret   string
 }
 
-func NewAuthService(userRepo *repository.UserRepository, sessionRepo *repository.SessionRepository, jwtSecret string) *AuthService {
+const LIVE_TOKEN_TIME = time.Hour * 24
+
+func NewAuthService(userRepo *repository.UserRepository, jwtSecret string) *AuthService {
 	return &AuthService{
 		userRepo:    userRepo,
-		sessionRepo: sessionRepo,
 		jwtSecret:   jwtSecret,
 	}
 }
@@ -27,21 +27,17 @@ func NewAuthService(userRepo *repository.UserRepository, sessionRepo *repository
 func (s *AuthService) Login(ctx context.Context, username, password string) (string, error) {
 	user, err := s.userRepo.CreateUser(ctx, username, password)
 	if err != nil {
-		return "", errors.New("invalid credentials")
+		return "", errors.New("Username already exist")
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": user.ID,
-		"exp":     time.Now().Add(time.Hour * 24).Unix(),
+		"exp":     time.Now().Add(LIVE_TOKEN_TIME).Unix(),
 	})
 
 	tokenString, err := token.SignedString([]byte(s.jwtSecret))
 	if err != nil {
 		return "", errors.New("failed to generate token")
-	}
-
-	if err := s.sessionRepo.CreateSession(ctx, user.ID, tokenString); err != nil {
-		return "", errors.New("failed to create session")
 	}
 
 	return tokenString, nil
