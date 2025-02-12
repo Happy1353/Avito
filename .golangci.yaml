@@ -1,0 +1,43 @@
+run:
+  timeout: 3m
+
+linters:
+  enable:
+    - errcheck
+    - govet
+    - staticcheck
+    - unused
+    - ineffassign
+    - typecheck
+    - bodyclose
+    - gofmt
+    - goimports
+    - gocritic
+    - gosimple
+    - gocognit
+    - goconst
+    - misspell
+    - whitespace
+    - unconvert
+    - prealloc
+    - goprintffuncname
+    - makezero
+
+  disable:
+    - lll # Отключаем проверку длины строк
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  staticcheck:
+    checks: ["all"]
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  exclude-use-default: false
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck

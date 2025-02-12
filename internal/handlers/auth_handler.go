@@ -12,7 +12,6 @@ type AuthHandler struct {
 	authService *service.AuthService
 }
 
-
 func NewAuthHandler(authService *service.AuthService) *AuthHandler {
 	return &AuthHandler{authService: authService}
 }
@@ -32,5 +31,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(token))
+	if _, err := w.Write([]byte(token)); err != nil {
+		http.Error(w, "Failed to write response", http.StatusInternalServerError)
+	}
 }

@@ -18,17 +18,21 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect to the database: %v", err)
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Printf("Error closing the database: %v", err)
+		}
+	}()
 
 	userRepo := repository.NewUserRepository(db)
 
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {
-		log.Fatal("JWT_SECRET is not set")
+		log.Panic("JWT_SECRET is not set")
 	}
 
 	r := router.NewRouter(userRepo, jwtSecret)
 
 	log.Println("Starting server on :8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Panic(http.ListenAndServe(":8080", r))
 }

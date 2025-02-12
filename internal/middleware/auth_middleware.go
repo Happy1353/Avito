@@ -8,6 +8,10 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+type contextKey string
+
+const userIDKey contextKey = "user_id"
+
 func AuthMiddleware(jwtSecret string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -23,7 +27,7 @@ func AuthMiddleware(jwtSecret string) func(http.Handler) http.Handler {
 				}
 				return []byte(jwtSecret), nil
 			})
-			
+
 			if err != nil || !token.Valid {
 				http.Error(w, "Invalid token", http.StatusUnauthorized)
 				return
@@ -41,7 +45,7 @@ func AuthMiddleware(jwtSecret string) func(http.Handler) http.Handler {
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), "user_id", int(userID))
+			ctx := context.WithValue(r.Context(), userIDKey, int(userID))
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

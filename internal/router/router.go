@@ -33,7 +33,6 @@ func NewRouter(userRepo *repository.UserRepository, jwtSecret string) *chi.Mux {
 	}))
 
 	// Логирование запросов
-	//r.Use(middleware.Logger)
 
 	r.Post("/api/auth", authHandler.Login)
 
@@ -41,10 +40,12 @@ func NewRouter(userRepo *repository.UserRepository, jwtSecret string) *chi.Mux {
 		r.Use(authMiddleware)
 
 		r.Get("/api/info", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("User Info"))
+			w.WriteHeader(http.StatusOK)
+			if _, err := w.Write([]byte("User Info")); err != nil {
+				http.Error(w, "Failed to write response", http.StatusInternalServerError)
+				return
+			}
 		})
-		// r.Post("/api/sendCoin", walletHandler.SendCoin)
-		// r.Post("/api/buy/{item}", merchHandler.BuyItem)
 	})
 
 	return r

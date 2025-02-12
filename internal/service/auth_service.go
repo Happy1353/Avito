@@ -11,16 +11,16 @@ import (
 )
 
 type AuthService struct {
-	userRepo    *repository.UserRepository
-	jwtSecret   string
+	userRepo  *repository.UserRepository
+	jwtSecret string
 }
 
 const LIVE_TOKEN_TIME = time.Hour * 24
 
 func NewAuthService(userRepo *repository.UserRepository, jwtSecret string) *AuthService {
 	return &AuthService{
-		userRepo:    userRepo,
-		jwtSecret:   jwtSecret,
+		userRepo:  userRepo,
+		jwtSecret: jwtSecret,
 	}
 }
 
