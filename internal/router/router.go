@@ -11,11 +11,12 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func NewRouter(userRepo *repository.UserRepository, jwtSecret string) *chi.Mux {
+func NewRouter(userRepo *repository.UserRepository, transactionRepo *repository.TransactionRepository, jwtSecret string) *chi.Mux {
 	authService := service.NewAuthService(userRepo, jwtSecret)
+	transactionService := service.NewTransactionService(transactionRepo, userRepo)
 
 	authHandler := handlers.NewAuthHandler(authService)
-	// merchHandler := handlers.NewMerchHandler()
+	transactionHandler := handlers.NewTransactionHandler(transactionService)
 	// walletHandler := handlers.NewWalletHandler()
 
 	authMiddleware := middleware.AuthMiddleware(jwtSecret)
@@ -46,6 +47,7 @@ func NewRouter(userRepo *repository.UserRepository, jwtSecret string) *chi.Mux {
 				return
 			}
 		})
+		r.Post("/api/sendCoin", transactionHandler.Transaction)
 	})
 
 	return r

@@ -13,8 +13,8 @@ CREATE TABLE merchandise (
 
 CREATE TABLE transactions (
     id SERIAL PRIMARY KEY,
-    sender_id INT REFERENCES users(id) ON DELETE CASCADE,
-    receiver_id INT REFERENCES users(id) ON DELETE CASCADE,
+    sender TEXT REFERENCES users(username) ON DELETE CASCADE,
+    receiver TEXT REFERENCES users(username) ON DELETE CASCADE,
     amount INT NOT NULL,
     created_at TIMESTAMP DEFAULT now()
 );
