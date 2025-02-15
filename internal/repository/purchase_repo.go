@@ -1,30 +1,39 @@
 package repository
 
-// import (
-// 	"context"
-// 	"database/sql"
-// 	"fmt"
-// )
+import (
+	"context"
+	"database/sql"
+	"fmt"
+)
 
-// type Purchase struct {
-// 	ID            int
-// 	UserID        int
-// 	MerchandiseID int
-// 	CreatedAt     string
-// }
+type Purchase struct {
+	ID            int
+	UserID        int
+	MerchandiseID int
+	CreatedAt     string
+}
 
-// type InventoryItem struct {
-// 	Type     string `json:"type"`
-// 	Quantity int    `json:"quantity"`
-// }
+type InventoryItem struct {
+	Type     string `json:"type"`
+	Quantity int    `json:"quantity"`
+}
 
-// type PurchesRepository struct {
-// 	db *sql.DB
-// }
+type PurchesRepository struct {
+	db *sql.DB
+}
 
-// func NewPurchesRepository(db *sql.DB) *PurchesRepository {
-// 	return &PurchesRepository{db: db}
-// }
+func NewPurchesRepository(db *sql.DB) *PurchesRepository {
+	return &PurchesRepository{db: db}
+}
+
+func (r *PurchesRepository) AddItem(ctx context.Context, userID int, itemID int) error {
+	_, err := r.db.ExecContext(ctx, `INSERT INTO purchases (user_id, merchandise_id) VALUES ($1, $2)`, userID, itemID)
+	if err != nil {
+		return fmt.Errorf("failed to insert purchase: %w", err)
+	}
+
+	return nil
+}
 
 // func (r *PurchesRepository) GetUserInventory(ctx context.Context, userID int) ([]InventoryItem, error) {
 // 	query := `

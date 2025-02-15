@@ -11,13 +11,14 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func NewRouter(userRepo *repository.UserRepository, transactionRepo *repository.TransactionRepository, jwtSecret string) *chi.Mux {
+func NewRouter(userRepo *repository.UserRepository, transactionRepo *repository.TransactionRepository, purchesRepo *repository.PurchesRepository, murchandiseRepo *repository.MurchandiseRepository, jwtSecret string) *chi.Mux {
 	authService := service.NewAuthService(userRepo, jwtSecret)
 	transactionService := service.NewTransactionService(transactionRepo, userRepo)
+	purchaseService := service.NewPurchaseService(purchesRepo, userRepo, murchandiseRepo, transactionRepo)
 
 	authHandler := handlers.NewAuthHandler(authService)
 	transactionHandler := handlers.NewTransactionHandler(transactionService)
-	// walletHandler := handlers.NewWalletHandler()
+	purchaseHandler := handlers.NewPurchaseHandler(purchaseService)
 
 	authMiddleware := middleware.AuthMiddleware(jwtSecret)
 
@@ -27,13 +28,11 @@ func NewRouter(userRepo *repository.UserRepository, transactionRepo *repository.
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Content-Type", "Authorization"},
+		AllowedHeaders:   []string{"Origin", "Accept", "Content-Type", "Authorization"},
 		ExposedHeaders:   []string{"X-Total-Count"},
 		AllowCredentials: true,
 		MaxAge:           300,
 	}))
-
-	// Логирование запросов
 
 	r.Post("/api/auth", authHandler.Login)
 
@@ -48,6 +47,7 @@ func NewRouter(userRepo *repository.UserRepository, transactionRepo *repository.
 			}
 		})
 		r.Post("/api/sendCoin", transactionHandler.Transaction)
+		r.Get("/api/buy/{item}", purchaseHandler.BuyItem)
 	})
 
 	return r

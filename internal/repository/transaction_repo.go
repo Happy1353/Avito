@@ -51,3 +51,12 @@ func (r *TransactionRepository) UpdateBalaces(ctx context.Context, receiver, sen
 
 	return nil
 }
+
+func (r *TransactionRepository) UpdateBalanceUser(ctx context.Context, user string, amount int) error {
+	_, err := r.db.ExecContext(ctx, "UPDATE users SET balance = balance - $1 WHERE username = $2", amount, user)
+	if err != nil {
+		return fmt.Errorf("failed to update user balance: %w", err)
+	}
+
+	return nil
+}
