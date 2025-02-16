@@ -1,8 +1,6 @@
 package router
 
 import (
-	"net/http"
-
 	"github.com/Happy1353/Avito/internal/handlers"
 	"github.com/Happy1353/Avito/internal/middleware"
 	"github.com/Happy1353/Avito/internal/repository"
@@ -15,10 +13,12 @@ func NewRouter(userRepo *repository.UserRepository, transactionRepo *repository.
 	authService := service.NewAuthService(userRepo, jwtSecret)
 	transactionService := service.NewTransactionService(transactionRepo, userRepo)
 	purchaseService := service.NewPurchaseService(purchesRepo, userRepo, murchandiseRepo, transactionRepo)
+	userService := service.NewUserService(userRepo, purchesRepo, transactionRepo)
 
 	authHandler := handlers.NewAuthHandler(authService)
 	transactionHandler := handlers.NewTransactionHandler(transactionService)
 	purchaseHandler := handlers.NewPurchaseHandler(purchaseService)
+	userHandler := handlers.NewUserHandler(userService)
 
 	authMiddleware := middleware.AuthMiddleware(jwtSecret)
 
@@ -39,13 +39,7 @@ func NewRouter(userRepo *repository.UserRepository, transactionRepo *repository.
 	r.Group(func(r chi.Router) {
 		r.Use(authMiddleware)
 
-		r.Get("/api/info", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			if _, err := w.Write([]byte("User Info")); err != nil {
-				http.Error(w, "Failed to write response", http.StatusInternalServerError)
-				return
-			}
-		})
+		r.Get("/api/info", userHandler.Info)
 		r.Post("/api/sendCoin", transactionHandler.Transaction)
 		r.Get("/api/buy/{item}", purchaseHandler.BuyItem)
 	})

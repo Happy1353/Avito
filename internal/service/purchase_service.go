@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/Happy1353/Avito/internal/repository"
 )
@@ -34,8 +33,6 @@ func (s *PurchaseService) BuyItem(ctx context.Context, userID int, itemName stri
 	if err != nil {
 		return errors.New("failed to get user")
 	}
-
-	fmt.Println(user.Balance, item.Price)
 
 	if user.Balance < item.Price {
 		return errors.New("insufficient funds")
